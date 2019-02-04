@@ -1,9 +1,26 @@
+var links = {};
+links["web"] = {
+    store: "http://download/test{qpenc}",
+    launch: "http://open/test{qp}",
+    redirect: "/clickfrommobile"
+};
+links["android"] = {
+    store: "https://play.google.com/store/apps/details?id=com.thekinapp.dev&pcampaignid=fdl_long&url=https://thekinapp.com/invitation{qpenc}",
+    launch: "https://thekinapp.com/group",
+    redirect: null
+};
+links["ios"] = {
+    store: "https://itunes.apple.com/app/id1437611153",
+    launch: "com.thekinapp.dev://group{qp}",
+    redirect: null
+};
+var LinkOptions = /** @class */ (function () {
+    function LinkOptions() {
+    }
+    return LinkOptions;
+}());
 function getMobileOperatingSystem() {
     var userAgent = navigator.userAgent || navigator.vendor || window.window.opera;
-    // Windows Phone must come first because its UA also contains "Android"
-    // if (/windows phone/i.test(userAgent)) {
-    //   return 'Windows Phone';
-    // }
     if (/android/i.test(userAgent)) {
         return "android";
     }
@@ -13,6 +30,24 @@ function getMobileOperatingSystem() {
     }
     return "web";
 }
-//document.body.innerHTML = getMobileOperatingSystem();
+function prepareLinks(linkCheck, newUrl) {
+    var links = document.getElementsByTagName("a");
+    for (var i = 0; i < links.length; i++) {
+        var link = links[i];
+        var source = link.getAttribute("href");
+        if (source.indexOf(linkCheck) >= 0) {
+            link.href = newUrl
+                .replace("{qp}", window.location.search)
+                .replace("{qpenc}", encodeURIComponent(window.location.search));
+        }
+    }
+}
 var channel = getMobileOperatingSystem();
-console.log(channel);
+if (links[channel]) {
+    console.log(channel);
+    if (links[channel].redirect !== null) {
+        window.location.href = links[channel].redirect;
+    }
+    prepareLinks("itunes.apple.com", links[channel].store);
+    prepareLinks("com.thekinapp", links[channel].launch);
+}
