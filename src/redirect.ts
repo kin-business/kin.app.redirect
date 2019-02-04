@@ -49,12 +49,16 @@ function prepareLinks(linkCheck: string, newUrl: string) {
   }
 }
 
-const channel = getMobileOperatingSystem();
-if (links[channel]) {
-  console.log(channel);
-  if (links[channel].redirect !== null) {
-    window.location.href = links[channel].redirect;
+(function() {
+  // your page initialization code here
+  // the DOM will be available here
+  const channel = getMobileOperatingSystem();
+  if (links[channel]) {
+    console.log(channel);
+    if (links[channel].redirect !== null) {
+      // window.location.href = links[channel].redirect;
+    }
+    prepareLinks("itunes.apple.com", links[channel].store);
+    prepareLinks("com.thekinapp", links[channel].launch);
   }
-  prepareLinks("itunes.apple.com", links[channel].store);
-  prepareLinks("com.thekinapp", links[channel].launch);
-}
+})();
