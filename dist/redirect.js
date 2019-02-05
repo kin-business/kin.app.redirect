@@ -1,6 +1,6 @@
 var links = {};
 links["web"] = {
-    store: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
+    store: "https://thekinapp.com/clickfrommobile?s={slug}&redirect={qpenc}",
     launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
     redirect: "/clickfrommobile"
 };
@@ -43,8 +43,10 @@ function prepareLinks(linkCheck, slug, newUrl) {
                 .replace("{qp}", queryParams)
                 .replace("{slug}", slug)
                 .replace("{qpenc}", encodeURIComponent(queryParams));
+            return true;
         }
     }
+    return false;
 }
 function injectLinks(slug) {
     var channel = getMobileOperatingSystem();
@@ -53,6 +55,6 @@ function injectLinks(slug) {
             console.log("Redirect:" + links[channel].redirect);
         }
         prepareLinks("itunes.apple.com", slug, links[channel].store);
-        prepareLinks("com.thekinapp", slug, links[channel].launch);
+        prepareLinks("com.thekinapp.dev://", slug, links[channel].launch);
     }
 }

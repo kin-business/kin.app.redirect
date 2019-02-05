@@ -1,6 +1,6 @@
 var links: { [id: string]: LinkOptions } = {};
 links["web"] = {
-  store: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
+  store: "https://thekinapp.com/clickfrommobile?s={slug}&redirect={qpenc}",
   launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
   redirect: "/clickfrommobile"
 };
@@ -50,8 +50,10 @@ function prepareLinks(linkCheck: string, slug: string, newUrl: string) {
         .replace("{qp}", queryParams)
         .replace("{slug}", slug)
         .replace("{qpenc}", encodeURIComponent(queryParams));
+      return true;
     }
   }
+  return false;
 }
 
 function injectLinks(slug: string) {
@@ -61,6 +63,6 @@ function injectLinks(slug: string) {
       console.log("Redirect:" + links[channel].redirect);
     }
     prepareLinks("itunes.apple.com", slug, links[channel].store);
-    prepareLinks("com.thekinapp", slug, links[channel].launch);
+    prepareLinks("com.thekinapp.dev://", slug, links[channel].launch);
   }
 }
