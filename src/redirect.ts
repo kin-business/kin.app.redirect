@@ -1,18 +1,18 @@
 var links: { [id: string]: LinkOptions } = {};
 links["web"] = {
-  store: "http://download/test{qpenc}",
-  launch: "http://open/test{qp}",
+  store: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
+  launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
   redirect: "/clickfrommobile"
 };
 links["android"] = {
   store:
-    "https://play.google.com/store/apps/details?id=com.thekinapp.dev&pcampaignid=fdl_long&url=https://thekinapp.com/invitation{qpenc}",
-  launch: "https://thekinapp.com/group",
+    "https://play.google.com/store/apps/details?id=com.thekinapp.dev&pcampaignid=fdl_long&url=https://thekinapp.com/{slug}?{qpenc}",
+  launch: "https://thekinapp.com/{slug}?{qp}",
   redirect: null
 };
 links["ios"] = {
   store: "https://itunes.apple.com/app/id1437611153",
-  launch: "com.thekinapp.dev://group{qp}",
+  launch: "com.thekinapp.dev://{slug}?{qp}",
   redirect: null
 };
 
@@ -36,29 +36,31 @@ function getMobileOperatingSystem() {
   return "web";
 }
 
-function prepareLinks(linkCheck: string, newUrl: string) {
+function prepareLinks(linkCheck: string, slug: string, newUrl: string) {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
     var link = links[i];
     var source = link.getAttribute("href");
+    const queryParams =
+      window.location.search.indexOf("?") === 0
+        ? window.location.search.substr(1, window.location.search.length - 1)
+        : window.location.search;
     if (source.indexOf(linkCheck) >= 0) {
       link.href = newUrl
-        .replace("{qp}", window.location.search)
-        .replace("{qpenc}", encodeURIComponent(window.location.search));
+        .replace("{qp}", queryParams)
+        .replace("{slug}", slug)
+        .replace("{qpenc}", encodeURIComponent(queryParams));
     }
   }
 }
 
-(function() {
-  // your page initialization code here
-  // the DOM will be available here
+function injectLinks(slug: string) {
   const channel = getMobileOperatingSystem();
   if (links[channel]) {
-    console.log(channel);
     if (links[channel].redirect !== null) {
-      // window.location.href = links[channel].redirect;
+      console.log("Redirect:" + links[channel].redirect);
     }
-    prepareLinks("itunes.apple.com", links[channel].store);
-    prepareLinks("com.thekinapp", links[channel].launch);
+    prepareLinks("itunes.apple.com", slug, links[channel].store);
+    prepareLinks("com.thekinapp", slug, links[channel].launch);
   }
-})();
+}
