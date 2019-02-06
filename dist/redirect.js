@@ -1,19 +1,3 @@
-var links = {};
-links["web"] = {
-    store: "https://thekinapp.com/clickfrommobile?s={slug}&redirect={qpenc}",
-    launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
-    redirect: "/clickfrommobile"
-};
-links["android"] = {
-    store: "https://play.google.com/store/apps/details?id=com.thekinapp.dev&pcampaignid=fdl_long&url=https://thekinapp.com/{slug}?{qpenc}",
-    launch: "https://thekinapp.com/{slug}?{qp}",
-    redirect: null
-};
-links["ios"] = {
-    store: "https://itunes.apple.com/app/id1437611153",
-    launch: "com.thekinapp.dev://{slug}?{qp}",
-    redirect: null
-};
 var LinkOptions = /** @class */ (function () {
     function LinkOptions() {
     }
@@ -50,6 +34,7 @@ function prepareLinks(linkCheck, slug, newUrl) {
 }
 function injectLinks(slug) {
     var channel = getMobileOperatingSystem();
+    var links = buildLinks();
     if (links[channel]) {
         if (links[channel].redirect !== null) {
             console.log("Redirect:" + links[channel].redirect);
@@ -57,4 +42,50 @@ function injectLinks(slug) {
         prepareLinks("itunes.apple.com", slug, links[channel].store);
         prepareLinks("com.thekinapp.dev://", slug, links[channel].launch);
     }
+}
+function getParameterByName(name, url) {
+    if (!url)
+        url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"), results = regex.exec(url);
+    if (!results)
+        return null;
+    if (!results[2])
+        return "";
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+function buildLinks() {
+    var links = {};
+    links["web"] = {
+        store: "https://thekinapp.com/clickfrommobile?s={slug}&redirect={qpenc}",
+        launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
+        redirect: "/clickfrommobile"
+    };
+    var env = getParameterByName("env", window.location.href);
+    console.log(env);
+    if (env == "dev") {
+        links["android"] = {
+            store: "https://play.google.com/store/apps/details?id=com.thekinapp.dev&pcampaignid=fdl_long&url=https://thekinapp.com/{slug}?{qpenc}",
+            launch: "https://thekinapp.com/{slug}?{qp}",
+            redirect: null
+        };
+        links["ios"] = {
+            store: "https://itunes.apple.com/app/id1437611153",
+            launch: "com.thekinapp.dev://{slug}?{qp}",
+            redirect: null
+        };
+    }
+    else {
+        links["android"] = {
+            store: "https://play.google.com/store/apps/details?id=com.thekinapp.prod&pcampaignid=fdl_long&url=https://thekinapp.com/{slug}?{qpenc}",
+            launch: "https://thekinapp.com/{slug}?{qp}",
+            redirect: null
+        };
+        links["ios"] = {
+            store: "https://itunes.apple.com/app/id1437611153",
+            launch: "com.thekinapp://{slug}?{qp}",
+            redirect: null
+        };
+    }
+    return links;
 }
