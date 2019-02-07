@@ -117,3 +117,4 @@ Links
 ## Reference
 
 - Firebase dynamic links: https://firebase.google.com/docs/dynamic-links/create-links
+- Full api: https://firebase.google.com/docs/reference/dynamic-links/link-shortener
