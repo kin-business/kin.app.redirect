@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "gulp": "^4.0.0",
+    "gulp": "4.0.2",
     "gulp-connect": "^5.7.0",
-    "gulp-typescript": "^5.0.0",
-    "gulp-util": "latest",
-    "prettier": "^1.16.4",
-    "typescript": "^3.3.1"
+    "gulp-typescript": "^5.0.1",
+    "gulp-util": "^3.0.8",
+    "prettier": "^1.18.2",
+    "typescript": "^3.5.3"
   },
   "scripts": {
     "start": "gulp start",
