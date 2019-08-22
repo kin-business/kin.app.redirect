@@ -22,31 +22,51 @@ function prepareLinks(linkCheck: string, slug: string, newUrl: string) {
   var links = document.getElementsByTagName("a");
   for (var i = 0; i < links.length; i++) {
     var link = links[i];
-    var source = link.getAttribute("href");
+    var source = link.getAttribute("rel");
+
     const queryParams =
       window.location.search.indexOf("?") === 0
         ? window.location.search.substr(1, window.location.search.length - 1)
         : window.location.search;
-    if (source.indexOf(linkCheck) >= 0) {
+    var search = location.search.substring(1);
+    var d = JSON.parse(
+      '{"' + search.replace(/&/g, '","').replace(/=/g, '":"') + '"}',
+      function(key, value) {
+        return key === "" ? value : decodeURIComponent(value);
+      }
+    );
+    console.log("d", d);
+    if (source != null && source.indexOf(linkCheck) >= 0) {
       link.href = newUrl
         .replace("{qp}", queryParams)
         .replace("{slug}", slug)
-        .replace("{qpenc}", encodeURIComponent(queryParams));
+        .replace("{qpenc}", encodeURIComponent(queryParams))
+        .replace("{uid}", d.uid);
       return true;
     }
   }
   return false;
 }
 
-function injectLinks(slug: string) {
+function readSlug() {
+  return window.location.pathname.replace(/\//g, "") || "home";
+}
+
+function injectLinks() {
   const channel = getMobileOperatingSystem();
+  const slug = readSlug();
   const links = buildLinks();
+
+  // console.log("channel", channel);
+  // console.log("slug", slug);
+  // console.log("links", links);
+
   if (links[channel]) {
     if (links[channel].redirect !== null) {
       console.log("Redirect:" + links[channel].redirect);
     }
-    prepareLinks("itunes.apple.com", slug, links[channel].store);
-    prepareLinks("com.thekinapp.dev://", slug, links[channel].launch);
+    prepareLinks("download", slug, links[channel].store);
+    prepareLinks("open-app", slug, links[channel].launch);
   }
 }
 
@@ -62,13 +82,8 @@ function getParameterByName(name: string, url: string): string {
 
 function buildLinks(): { [id: string]: LinkOptions } {
   var links: { [id: string]: LinkOptions } = {};
-  links["web"] = {
-    store: "https://thekinapp.com/clickfrommobile?s={slug}&redirect={qpenc}",
-    launch: "https://thekinapp.com/clickfrommobile?s={slug}&{qp}",
-    redirect: "/clickfrommobile"
-  };
+
   const env = getParameterByName("env", window.location.href);
-  console.log(env);
 
   if (env == "dev") {
     links["android"] = {
@@ -82,6 +97,13 @@ function buildLinks(): { [id: string]: LinkOptions } {
       launch: "com.thekinapp.dev://{slug}?{qp}",
       redirect: null
     };
+    links["web"] = {
+      store:
+        "https://web.dev.thekinapp.com/home/kins/{slug}/{uid}?&redirect={qpenc}",
+      launch:
+        "https://web.dev.thekinapp.com/home/kins/{slug}/{uid}?&redirect={qpenc}",
+      redirect: "/clickfrommobile"
+    };
   } else {
     links["android"] = {
       store:
@@ -93,6 +115,13 @@ function buildLinks(): { [id: string]: LinkOptions } {
       store: "https://itunes.apple.com/app/id1437611153",
       launch: "com.thekinapp://{slug}?{qp}",
       redirect: null
+    };
+    links["web"] = {
+      store:
+        "https://web.thekinapp.com/home/kins/{slug}/{uid}?&redirect={qpenc}",
+      launch:
+        "https://web.thekinapp.com/home/kins/{slug}/{uid}?&redirect={qpenc}",
+      redirect: "/clickfrommobile"
     };
   }
   return links;

@@ -108,9 +108,9 @@ Links
 ## Adding js to website
 
 ```js
-<script src="https://cdn.jsdelivr.net/gh/kin-business/kin.app.redirect/dist/redirect.js" type="text/javascript"></script>
+<script src="https://cdn.jsdelivr.net/gh/kin-business/kin.app.redirect/dist@0.0.1/redirect.js" type="text/javascript"></script>
 <script type="text/javascript">
-  window.onload = function () { injectLinks("group"); }
+  window.onload = function () { injectLinks(); }
 </script>
 ```
 
